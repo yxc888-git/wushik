@@ -1,0 +1,15 @@
+{
+  "name": "wushik-henan",
+  "version": "1.0.0",
+  "description": "河南郑州五十K（五十凯·见张乎）—— 两副牌四人扑克，单机 / P2P 联机 / 服务器版三合一",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node serve.js",
+    "test": "node test/core.test.mjs",
+    "server": "node server/server.js"
+  },
+  "dependencies": {
+    "localtunnel": "^2.0.2"
+  }
+}

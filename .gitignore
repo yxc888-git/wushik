@@ -1,0 +1,11 @@
+# 依赖 / 临时隧道
+node_modules/
+.tunnel/
+
+# 截图等产物（非源码）
+test/shot-*.png
+
+# 系统临时
+/tmp/
+*.log
+.DS_Store

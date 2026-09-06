@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>五十K · 河南郑州版（五十凯见张乎）</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2314603f'/%3E%3Ctext x='16' y='23' font-size='19' text-anchor='middle' fill='%23e8c46a' font-family='sans-serif' font-weight='bold'%3E5K%3C/text%3E%3C/svg%3E">
+<!-- PWA：手机浏览器"添加到主屏幕"后就是全屏 App；也是 PWABuilder 打 APK 的前提 -->
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#14603f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="五十K">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ============ 首页：选模式 ============ -->
+<div id="home" class="screen active">
+  <div class="home-card">
+    <div class="home-title">五十 K</div>
+    <div class="home-sub">河南郑州版 · 五十凯见张乎 · 两副牌 108 张</div>
+
+    <div class="mode-grid">
+      <button class="mode-btn primary" id="btnSolo">
+        <span class="mode-icon">🎴</span>
+        <span class="mode-name">单机版</span>
+        <span class="mode-desc">你 + 电脑，立刻开打</span>
+      </button>
+      <button class="mode-btn" id="btnOnline">
+        <span class="mode-icon">👥</span>
+        <span class="mode-name">联机开房</span>
+        <span class="mode-desc">4 个人各玩各的手机 / 电脑</span>
+      </button>
+    </div>
+
+    <div class="seat-count-row">
+      <span class="seat-count-label">单机人数</span>
+      <div class="seat-count-btns">
+        <button class="sc-btn" data-n="3">3 人</button>
+        <button class="sc-btn active" data-n="4">4 人</button>
+        <button class="sc-btn" data-n="5">5 人</button>
+      </div>
+    </div>
+
+    <div class="home-note">
+      <b>玩法速览：</b><b>各管各的</b>（不打对家）· 见张乎：能压必须压 ·
+      牌型只有 单/对/三张/五十K/炸，<b>不能带牌</b> · <b>炸弹只有4张</b>且须同色（全红/全黑，黑&gt;红）·
+      5=5分 10=10分 K=10分，全场 200 分 · 除末游外全出完即结束，<b>末游（及倒数第二）交公粮</b>给头游（及二游）。
+      <a href="#" id="btnRules">查看完整规则</a>
+    </div>
+    <div class="home-foot">规则有地方差异？点底部「规矩」随时改，改完立刻生效。</div>
+  </div>
+</div>
+
+<!-- ============ 联机大厅 ============ -->
+<div id="lobby" class="screen">
+  <div class="home-card">
+    <div class="home-title small">联机开房</div>
+    <div class="home-sub">零服务器成本：用 P2P 直连，房主把房间号发给三个人就行</div>
+
+    <div class="lobby-block">
+      <label>你的名字</label>
+      <input id="inpName" type="text" maxlength="8" placeholder="比如：老余">
+    </div>
+
+    <div class="lobby-row">
+      <button class="big-btn primary" id="btnCreate">创建房间</button>
+      <button class="big-btn" id="btnJoin">加入房间</button>
+    </div>
+
+    <div class="lobby-block" id="joinBlock" style="display:none">
+      <label>房间号</label>
+      <input id="inpRoom" type="text" placeholder="房主给你的 6 位房间号" maxlength="10">
+      <button class="big-btn primary full" id="btnJoinGo">进 去</button>
+    </div>
+
+    <div class="room-box" id="roomBox" style="display:none">
+      <div class="room-no-label">房间号</div>
+      <div class="room-no" id="roomNo">------</div>
+      <button class="mini-btn" id="btnCopyRoom">复制房间号</button>
+      <button class="mini-btn" id="btnCopyInvite">复制邀请链接</button>
+      <div class="seat-list" id="seatList"></div>
+      <button class="big-btn primary full" id="btnStartOnline" disabled>开始游戏</button>
+      <div class="lobby-tip" id="lobbyTip">等 4 个人到齐就自动开打（房主也不用点开始）</div>
+    </div>
+
+    <button class="big-btn ghost full" id="btnBackHome">返回</button>
+  </div>
+</div>
+
+<!-- ============ 牌桌 ============ -->
+<div id="table" class="screen">
+  <!-- 顶栏 -->
+  <div class="topbar">
+    <div class="tb-left">
+      <span class="tb-title">五十K</span>
+      <span class="tb-round" id="tbRound">第 1 局</span>
+    </div>
+    <div class="tb-score">
+      <!-- 各打各的：显示每个座位自己的累计积分（无我方/敌方） -->
+      <div class="score-line" id="scoreLine">我 0 · 下家 0 · 二家 0 · 上家 0</div>
+    </div>
+    <div class="tb-right">
+      <span class="pot-chip" id="potChip" title="当前桌面上的分">桌面 0 分</span>
+      <button class="mini-btn" id="btnSound" title="音效开关">🔊 音效</button>
+      <button class="mini-btn" id="btnRules2">规矩</button>
+      <button class="mini-btn" id="btnMenu">☰</button>
+    </div>
+  </div>
+
+  <!-- 牌桌区 -->
+  <div class="felt">
+    <!-- 五十K 提示牌（桌面左侧常驻） -->
+    <div class="badge-510k" title="五十K说明">
+      <b>五十K</b>
+      <span>5 + 10 + K 三张一套</span>
+      <span>同花 = <em>正五十K</em>（炮）</span>
+      <span>黑♠ &gt; 红♥ &gt; 方♦ &gt; 梅♣</span>
+      <span>混花 = 副五十K（小炮）</span>
+    </div>
+    <!-- 对手座位：按人数动态生成（圆桌定位） -->
+    <div class="seat-ring" id="seatRing"></div>
+
+    <!-- 中央出牌区 -->
+    <div class="center">
+      <!-- 中央永远摆"当前最大的一手牌"（不管是谁出的），大号牌完整显示 -->
+      <div class="played-owner" id="playedOwner"></div>
+      <div class="played-slot main" id="playedMain"></div>
+      <!-- 我出的牌：被别人压过后落到这里淡化显示 -->
+      <div class="played-slot mine" id="playedMine"></div>
+      <div class="center-tip" id="centerTip"></div>
+    </div>
+  </div>
+
+  <!-- 我的手牌区 -->
+  <div class="myarea">
+    <div class="my-head">
+      <span class="my-name">我（<span id="myTeamName">个人</span>）</span>
+      <span class="my-count">剩 <b id="cnt0">27</b> 张</span>
+      <span class="my-pot" id="myPot">抓到 0 分</span>
+    </div>
+    <div class="hand" id="hand"></div>
+    <div class="actions">
+      <button class="act-btn" id="btnPass">不 出</button>
+      <button class="act-btn hint" id="btnHint">提 示</button>
+      <button class="act-btn primary" id="btnPlay">出 牌</button>
+    </div>
+  </div>
+
+  <!-- 飘字提示 -->
+  <div class="toast" id="toast"></div>
+</div>
+
+<!-- ============ 骰子定首发（第一局） ============ -->
+<div class="modal" id="modalDice">
+  <div class="modal-card dice-card">
+    <div class="res-title">第一局 · 掷骰子定首发</div>
+    <div class="dice-seat" id="diceSeat">🎲</div>
+    <div class="dice-tip" id="diceTip">点骰子，指到谁谁先出牌</div>
+    <div class="res-btns">
+      <button class="big-btn primary" id="btnRollDice">🎲 掷骰子</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 结算弹窗 ============ -->
+<div class="modal" id="modalResult">
+  <div class="modal-card">
+    <div class="res-title" id="resTitle">本局结束</div>
+    <div class="res-catch" id="resCatch"></div>
+    <table class="res-table" id="resTable"></table>
+    <div class="res-btns">
+      <button class="big-btn primary" id="btnNextRound">再来一局</button>
+      <button class="big-btn ghost" id="btnBackMenu">回主菜单</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 规则设置弹窗 ============ -->
+<div class="modal" id="modalRules">
+  <div class="modal-card wide">
+    <div class="res-title">规矩设置</div>
+    <div class="rules-preset">
+      <label>地方玩法：</label>
+      <select id="selPreset"></select>
+    </div>
+    <div class="rules-grid" id="rulesGrid"></div>
+    <div class="rules-help" id="rulesHelp"></div>
+    <div class="res-btns">
+      <button class="big-btn primary" id="btnRulesSave">保存并重开</button>
+      <button class="big-btn ghost" id="btnRulesClose">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 菜单抽屉 ============ -->
+<div class="modal" id="modalMenu">
+  <div class="modal-card">
+    <div class="res-title">菜单</div>
+    <div class="menu-list">
+      <button class="menu-item" id="mRules">规矩设置</button>
+      <button class="menu-item" id="mSound">🔊 音效：开</button>
+      <button class="menu-item" id="mRestart">重开本局</button>
+      <button class="menu-item" id="mShowCards">亮出所有牌（调试）</button>
+      <button class="menu-item" id="mHome">回主菜单</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="src/ui/app.js"></script>
+</body>
+</html>
