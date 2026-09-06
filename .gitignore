@@ -9,3 +9,11 @@ test/shot-*.png
 /tmp/
 *.log
 .DS_Store
+
+# Serveo 私钥 / 临时 token（绝不入库）
+serveo_key
+serveo_key.pub
+token.txt
+
+# 部署脚本（含一次性逻辑，非游戏源码）
+deploy.sh
