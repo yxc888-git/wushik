@@ -17,3 +17,11 @@ token.txt
 
 # 部署脚本（含一次性逻辑，非游戏源码）
 deploy.sh
+
+# APK 打包产物与签名材料（含密码，绝不入库）
+tools/apk_out/
+tools/apk_package.zip
+tools/apk_request.json
+
+# 用户站点仓库（独立 git，勿入库）
+tools/site-root/
